@@ -1,4 +1,4 @@
-client  = (require('../client'))(3000)
+client  = (require('../lib/client'))(3000)
 
 describe 'client'
   it 'runs synchronise js on the server'

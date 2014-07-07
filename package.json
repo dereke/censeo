@@ -6,9 +6,11 @@
   "scripts": {
     "test": "node_modules/karma/bin/karma start"
   },
+  "main":"index.js",
   "files": [
-    "server.js",
-    "client.js"
+    "index.js",
+    "lib/server.js",
+    "lib/client.js"
   ],
   "license": "ISC",
   "dependencies": {
