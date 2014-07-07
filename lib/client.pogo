@@ -14,7 +14,7 @@ module.exports(port)=
 
     exec(type, func)=
       socket = self.get socket!()
-      promise @(success)
+      promise @(success, error)
         call id = ++self.count
         socket.emit("run:#(type)", { 
           func  = func.toString()
@@ -22,6 +22,7 @@ module.exports(port)=
         })
 
         socket.on("ran:#(call id)", success)
+        socket.on("error:#(call id)", error)
 
     run(func)=
       self.exec('sync', func)
