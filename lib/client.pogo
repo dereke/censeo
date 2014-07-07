@@ -12,24 +12,23 @@ module.exports(port)=
 
     count = 0
 
-    exec(type, func)=
+    exec(options)=
       socket = self.get socket!()
       promise @(success, error)
-        call id = ++self.count
-        socket.emit("run:#(type)", { 
-          func  = func.toString()
-          id    = call id
-        })
+        options.id = ++self.count
+        socket.emit("run", options)
+        socket.on("ran:#(options.id)", success)
+        socket.on("error:#(options.id)", error)
 
-        socket.on("ran:#(call id)", success)
-        socket.on("error:#(call id)", error)
-
-    run(func)=
-      self.exec('sync', func)
-
-    run async pogo(func)=
-      self.exec('async-pogo', func)
-
-    run async js(func)=
-      self.exec('async-js', func)
+    run(promises: false, func)=
+      options = {
+        func = func.toString()
+      }
+      if (promises)
+        options.promise = true
+      else      
+        if (func.length == 1)
+          options.callback = true
+        
+      self.exec(options, func)
   }

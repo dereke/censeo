@@ -16,7 +16,7 @@ describe 'client'
 
   describe 'asynchronise JavaScript'
     it 'runs on the server'
-      result = client.run async js! @(callback)
+      result = client.run! @(callback)
         fs =  require 'fs'
         fs.readdir(process.cwd(), callback)
 
@@ -24,13 +24,13 @@ describe 'client'
       
     it 'throws an error when one occurs on the server'
       try
-        client.run async js! @{ throw 'SERVER ERROR'}
+        client.run! @{ throw 'SERVER ERROR'}
       catch(e)
         expect(e).to.equal('SERVER ERROR')
     
   describe 'asynchronise PogoScript'
     it 'runs on the server'
-      result = client.run async pogo!
+      result = client.run!(promises: true)
         fs =  require 'fs'
         fs.readdir!(process.cwd(), ^)
 
@@ -38,6 +38,6 @@ describe 'client'
 
     it 'throws an error when one occurs on the server'
       try
-        client.run async pogo! @{ throw 'SERVER ERROR'}
+        client.run!(promises: true) @{ throw 'SERVER ERROR'}
       catch(e)
         expect(e).to.equal('SERVER ERROR')
