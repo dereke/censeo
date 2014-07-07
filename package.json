@@ -3,9 +3,23 @@
   "version": "0.1.0",
   "description": "Run arbitrary JavaScript or PogoScript on a server",
   "author": "Derek Ekins <derek@spathi.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/dereke/censeo.git"
+  },
   "scripts": {
     "test": "node_modules/karma/bin/karma start"
   },
+  "bugs": {
+    "url": "https://github.com/dereke/censeo/issues"
+  },
+  "keywords": [
+    "eval",
+    "runtime",
+    "test",
+    "mocha",
+    "pogo"
+  ],
   "main":"index.js",
   "files": [
     "index.js",
