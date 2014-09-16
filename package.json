@@ -28,12 +28,12 @@
   ],
   "license": "ISC",
   "dependencies": {
-    "pogo": "^0.8.2",
     "socket.io": "^1.0.6",
     "socket.io-client": "^1.0.6",
-    "bluebird": "2.1.1"
+    "bluebird": "^2.2.2"
   },
   "devDependencies": {
+    "pogo": "^0.9.5",
     "browserify": "^4.2.0",
     "karma": "^0.12.16",
     "karma-browserify": "^0.2.1",
