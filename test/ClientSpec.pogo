@@ -42,7 +42,15 @@ describe 'client'
         client.run!(promises: true) @{ throw 'SERVER ERROR'}
       catch(e)
         expect(e).to.equal('SERVER ERROR')
-        
+
+  describe 'require a file on the server'
+    it'requires the correct file'
+      result = client.run!
+        test = serverRequire './test/requireFile'
+        test()
+
+      expect(result).to.be.true
+      
   describe 'long running task'
     it 'runs on the server and can be stopped later' @(done) =>
       self.timeout(5000)

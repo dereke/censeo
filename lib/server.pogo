@@ -2,6 +2,12 @@ module.exports(port)=
   io = (require('socket.io'))()
   tasks = []
   io.on('connection') @(socket)
+    serverRequire(path)=
+      if (path.0 == '.')
+        path := "#(process.cwd())/#(path)"
+
+      require(path)
+
     convert error to emit(options, run)=
       try
         run!()
@@ -49,11 +55,11 @@ module.exports(port)=
           run(options)
           
     socket.on('stop') @(options)
-      task = [task <- tasks, task.id == options.id, task].0
+      runningTask = [task <- tasks, task.id == options.id, task].0
       
-      if (task)
-        task.stop!(^)
-        tasks.splice(tasks.indexOf(task), 1)
+      if (runningTask)
+        runningTask.stop!(^)
+        tasks.splice(tasks.indexOf(runningTask), 1)
         socket.emit("stopped:#(options.id)")
 
   io.listen(port)
