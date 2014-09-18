@@ -60,7 +60,7 @@ describe 'client'
   describe 'long running task'
     it 'runs on the server and can be stopped later' @(done) =>
       self.timeout(5000)
-      task = client.run!(task: true)
+      task = client.runTask!()
         http    = require 'http'
         app = http.createServer @(req, res)
           headers = {
@@ -98,3 +98,24 @@ describe 'client'
           done()
         else
           @throw e
+
+    it'runs a task containing promises' @(done)
+      task = client.runTask!()
+        asyncTaskRan = false
+        intervalId = setInterval
+          fs = require 'fs'
+          fs.readdir!(process.cwd(), ^)
+          asyncTaskRan := true
+        200
+
+        {
+          stop(done)= 
+            clearInterval(intervalId)
+            done(asyncTaskRan)
+        }
+
+      setTimeout
+        result = task.stop!()
+        expect(result).to.be.true
+        done()
+      500

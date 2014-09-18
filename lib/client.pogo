@@ -8,9 +8,6 @@ module.exports(port)=
             socket.on("stopped:#(options.id)", success)
             socket.emit("stop", options)
       })
-      
-      
-
 
   {
     get socket()=
@@ -25,20 +22,30 @@ module.exports(port)=
 
     count = 0
     
-    
     exec(options)=
       socket = self.get socket!()
       promise @(success, error)      
         options.id = ++self.count
         socket.emit("run", options)
         socket.on("ran:#(options.id)", success)
-        running(socket, options, success)
         socket.on("error:#(options.id)", error)
 
-    run(promises: false, task: false, context = {}, func)=
+    runTask(context = {}, func)=
       options = {
         func    = func.toString()
-        task    = task
+        context = context
+      }
+
+      socket = self.get socket!()
+      promise @(success, error)      
+        options.id = ++self.count
+        socket.emit("runTask", options)
+        socket.on("error:#(options.id)", error)
+        running(socket, options, success)
+
+    run(promises = false, context = {}, func)=
+      options = {
+        func    = func.toString()
         context = context
       }
       if (promises)

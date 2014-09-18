@@ -1,8 +1,13 @@
+serverRequire(path)=
+  if (path.0 == '.')
+    path := "#(process.cwd())/#(path)"
+
+  require(path)
+
 module.exports(port)=
   io = (require('socket.io'))()
   tasks = []
   io.on('connection') @(socket)
-
     convert error to emit(options, run)=
       try
         run!()
@@ -10,15 +15,7 @@ module.exports(port)=
         socket.emit("error:#(options.id)", e)
         
     emit result(options, result)=
-      if (options.task)
-        tasks.push({
-          id = options.id
-          stop = result.stop
-        })
-        socket.emit("running:#(options.id)", result)
-      else
-        socket.emit("ran:#(options.id)", result)
- 
+      socket.emit("ran:#(options.id)", result)
  
     run with promise(options)=
       options.context.Promise = require 'bluebird'
@@ -30,16 +27,7 @@ module.exports(port)=
         exec(options.context, options.func)
 
     exec(context, func, callback)=
-      originalRequire = require
-
       context.process = process
-
-      serverRequire(path)=
-        if (path.0 == '.')
-          path := "#(process.cwd())/#(path)"
-
-        originalRequire(path)
-
       context.require = require
       context.serverRequire = serverRequire
 
@@ -50,6 +38,7 @@ module.exports(port)=
 
         return (#(func))(callback);
       ")
+
       runFunc(context, callback)
         
     run with callback(options)=
@@ -59,11 +48,47 @@ module.exports(port)=
       convert error to emit(options)
         exec(options.context, options.func, callback)
         
-
     run(options)=
       convert error to emit(options)
         result = exec(options.context, options.func)
         emit result(options, result)
+
+    socket.on('runTask') @(options)
+      context = options.context 
+
+      context.Promise = require 'bluebird'
+      context.process = process
+      context.require = require
+      context.serverRequire = serverRequire
+
+      runFunc = Function("context", "
+        for (var property in context) {
+          eval ('var '+property+'= context.'+property);
+        }
+
+        // in a task we just need to swallow root level promises that complete
+        var gen1_promisify = function(fn) {
+            return new Promise(function(onFulfilled, onRejected) {
+                fn(function(error, result) {
+                    if (error) {
+                        onRejected(error);
+                    } else {
+                        onFulfilled(result);
+                    }
+                });
+            });
+        };
+
+        return (#(options.func))();
+      ")
+
+      result = runFunc(context)
+
+      tasks.push({
+        id = options.id
+        stop = result.stop
+      })
+      socket.emit("running:#(options.id)", result)
 
     socket.on('run') @(options)
       if(options.promise)
@@ -78,8 +103,8 @@ module.exports(port)=
       runningTask = [task <- tasks, task.id == options.id, task].0
       
       if (runningTask)
-        runningTask.stop!(^)
-        tasks.splice(tasks.indexOf(runningTask), 1)
-        socket.emit("stopped:#(options.id)")
+        runningTask.stop() @(result)
+          tasks.splice(tasks.indexOf(runningTask), 1)
+          socket.emit("stopped:#(options.id)", result)
 
   io.listen(port)
