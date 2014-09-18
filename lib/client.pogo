@@ -35,10 +35,11 @@ module.exports(port)=
         running(socket, options, success)
         socket.on("error:#(options.id)", error)
 
-    run(promises: false, task: false, func)=
+    run(promises: false, task: false, context = {}, func)=
       options = {
-        func = func.toString()
-        task = task
+        func    = func.toString()
+        task    = task
+        context = context
       }
       if (promises)
         options.promise = true

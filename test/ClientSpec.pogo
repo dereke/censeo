@@ -13,7 +13,13 @@ describe 'client'
         client.run! @{ throw 'SERVER ERROR'}
       catch(e)
         expect(e).to.equal('SERVER ERROR')
-    
+   
+  describe 'marshall data from client to server'
+    it'passes variables to the server'
+      result = client.run!(context: {year = 2014})
+        year + 1
+
+      expect(result).to.equal(2015)
 
   describe 'asynchronise JavaScript'
     it 'runs on the server'
