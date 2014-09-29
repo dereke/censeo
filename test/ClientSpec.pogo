@@ -43,6 +43,20 @@ describe 'client'
 
       expect(result).to.include('node_modules')
 
+    it 'runs a foreach on the server'
+      result = client.run!(promises: true)
+        double(value)=
+          promise @(success)
+            success(value*2)
+
+        sum = 0
+        for each @(item) in ([1,2,3])
+          sum := sum + double!(item)
+
+        sum
+
+      expect(result).to.equal(12)
+
     it 'throws an error when one occurs on the server'
       try
         client.run!(promises: true) @{ throw 'SERVER ERROR'}

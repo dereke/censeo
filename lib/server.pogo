@@ -4,6 +4,41 @@ serverRequire(path)=
 
   require(path)
 
+pogoWrappers()=
+  "
+    //TODO it would be nice if we could just get these from pogo
+        var gen1_promisify = function(fn) {
+            return new Promise(function(onFulfilled, onRejected) {
+                fn(function(error, result) {
+                    if (error) {
+                        onRejected(error);
+                    } else {
+                        onFulfilled(result);
+                    }
+                });
+            });
+        };
+
+        var gen2_asyncFor = function(test, incr, loop) {
+          return new Promise(function(success, failure) {
+            function testAndLoop(loopResult) {
+              Promise.resolve(test()).then(function(testResult) {
+                if (testResult) {
+                  Promise.resolve(loop()).then(incrTestAndLoop, failure);
+                } else {
+                  success(loopResult);
+                }
+              }, failure);
+            }
+            function incrTestAndLoop(loopResult) {
+              Promise.resolve(incr()).then(function() {
+                testAndLoop(loopResult);
+              }, failure);
+            }
+            testAndLoop();
+          });
+        };"
+        
 module.exports(port)=
   io = (require('socket.io'))()
   tasks = []
@@ -18,13 +53,27 @@ module.exports(port)=
       socket.emit("ran:#(options.id)", result)
  
     run with promise(options)=
-      options.context.Promise = require 'bluebird'
-      options.context.gen1_promisify(callback)=
-        callback() @(error, result)
-          emit result(options, result)
-
       convert error to emit(options)
-        exec(options.context, options.func)
+        func    = options.func
+        context = options.context
+
+        context.Promise = require 'bluebird'
+        context.process = process
+        context.require = require
+        context.serverRequire = serverRequire
+
+        runFunc = Function("context", "callback", "
+          for (var property in context) {
+            eval ('var '+property+'= context.'+property);
+          }
+
+          #(pogoWrappers())
+
+          return (#(func))();
+        ")
+
+        result = runFunc(context)!
+        emitResult(options, result)
 
     exec(context, func, callback)=
       context.process = process
@@ -66,23 +115,12 @@ module.exports(port)=
           eval ('var '+property+'= context.'+property);
         }
 
-        // in a task we just need to swallow root level promises that complete
-        var gen1_promisify = function(fn) {
-            return new Promise(function(onFulfilled, onRejected) {
-                fn(function(error, result) {
-                    if (error) {
-                        onRejected(error);
-                    } else {
-                        onFulfilled(result);
-                    }
-                });
-            });
-        };
+        #(pogoWrappers())
 
         return (#(options.func))();
       ")
 
-      result = runFunc(context)
+      result = runFunc!(context)
 
       tasks.push({
         id = options.id
