@@ -7,7 +7,8 @@ serverRequire(path)=
 pogoWrappers()=
   "
     //TODO it would be nice if we could just get these from pogo
-        var gen1_promisify = function(fn) {
+      
+        var promisify = function(fn) {
             return new Promise(function(onFulfilled, onRejected) {
                 fn(function(error, result) {
                     if (error) {
@@ -17,9 +18,13 @@ pogoWrappers()=
                     }
                 });
             });
-        };
+        }.toString();
 
-        var gen2_asyncFor = function(test, incr, loop) {
+        for (var iteration=1; iteration<10; iteration++) {
+          eval('var gen'+iteration+'_promisify = ' + promisify );
+        }
+
+        var asyncFor = function(test, incr, loop) {
           return new Promise(function(success, failure) {
             function testAndLoop(loopResult) {
               Promise.resolve(test()).then(function(testResult) {
@@ -37,7 +42,13 @@ pogoWrappers()=
             }
             testAndLoop();
           });
-        };"
+        }.toString();
+        
+        
+        for (var iteration=1; iteration<10; iteration++) {
+          eval('var gen'+iteration+'_asyncFor = ' + asyncFor );
+        }
+        "
         
 module.exports(port)=
   io = (require('socket.io'))()
