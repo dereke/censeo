@@ -70,6 +70,17 @@ describe 'client'
         test()
 
       expect(result).to.be.true
+
+    it 'requires a file that does not exist'
+      try
+        client.run!
+          serverRequire './test/doesNotExist' 
+
+        @throw @new 'Should Not Reach This Code'
+      catch(e)
+        expect(e.message).to.contain("Censeo could not find the file")
+        expect(e.message).to.contain("./test/doesNotExist")
+
       
   describe 'long running task'
     it 'runs on the server and can be stopped later' @(done) =>

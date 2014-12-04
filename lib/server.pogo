@@ -2,7 +2,16 @@ serverRequire(path)=
   if (path.0 == '.')
     path := "#(process.cwd())/#(path)"
 
-  require(path)
+  try
+    require(path)
+  catch(e)
+    if (e.code == 'MODULE_NOT_FOUND')
+      @throw {
+        message = "Censeo could not find the file '#(path)'"
+        code = e.code
+      }
+    else
+      @throw e
 
 pogoWrappers()=
   "
