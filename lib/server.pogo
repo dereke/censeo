@@ -1,6 +1,8 @@
 serverRequire(path)=
   if (path.0 == '.')
     path := "#(process.cwd())/#(path)"
+  else
+    path := "#(process.cwd())/node_modules/#(path)"
 
   try
     require(path)
@@ -79,7 +81,7 @@ module.exports(port)=
 
         context.Promise = require 'bluebird'
         context.process = process
-        context.require = require
+        context.require = serverRequire
         context.serverRequire = serverRequire
 
         runFunc = Function("context", "callback", "
@@ -97,7 +99,7 @@ module.exports(port)=
 
     exec(context, func, callback)=
       context.process = process
-      context.require = require
+      context.require = serverRequire
       context.serverRequire = serverRequire
 
       runFunc = Function("context", "callback", "
@@ -127,7 +129,7 @@ module.exports(port)=
 
       context.Promise = require 'bluebird'
       context.process = process
-      context.require = require
+      context.require = serverRequire
       context.serverRequire = serverRequire
 
       runFunc = Function("context", "
