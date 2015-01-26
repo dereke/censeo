@@ -1,15 +1,14 @@
 serverRequire(path)=
+  tryPath = path 
   if (path.0 == '.')
-    path := "#(process.cwd())/#(path)"
-  else
-    path := "#(process.cwd())/node_modules/#(path)"
+    tryPath := "#(process.cwd())/#(path)"
 
   try
-    require(path)
+    require(tryPath)
   catch(e)
     if (e.code == 'MODULE_NOT_FOUND')
       @throw {
-        message = "Censeo could not find the file '#(path)'"
+        message = "Censeo could not find the file '#(tryPath)'"
         code = e.code
       }
     else
