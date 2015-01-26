@@ -38,7 +38,7 @@ describe 'client'
   describe 'asynchronise PogoScript'
     it 'runs on the server'
       result = client.run!(promises: true)
-        fs =  require 'fs'
+        fs = require 'fs'
         fs.readdir!(process.cwd(), ^)
 
       expect(result).to.include('node_modules')
@@ -144,3 +144,11 @@ describe 'client'
         expect(result).to.be.true
         done()
       500
+
+  it 'returns the error when starting a task fails' @(done)
+    try
+      client.runTask!()
+        null.invalidMethodCall()
+    catch(e)
+      done()
+
