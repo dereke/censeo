@@ -150,5 +150,6 @@ describe 'client'
       client.runTask!()
         null.invalidMethodCall()
     catch(e)
+      expect(e).to.contain("Cannot call method 'invalidMethodCall' of null")
       done()
 

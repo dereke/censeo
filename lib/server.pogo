@@ -141,20 +141,15 @@ module.exports(port)=
         return (#(options.func))();
       ")
 
-      result = nil
       try
-        result := runFunc!(context)
-      catch(e)
-        console.log ('Error starting task on server', e)
-
-      if (result)
+        result = runFunc!(context)
         tasks.push({
           id = options.id
           stop = result.stop
         })
         socket.emit("running:#(options.id)", result)
-      else
-        socket.emit("error:#(options.id)")
+      catch(e)
+        socket.emit("error:#(options.id)", e.message)
 
     socket.on('run') @(options)
       if(options.promise)
