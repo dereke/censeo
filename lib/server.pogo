@@ -68,13 +68,16 @@ module.exports(port)=
       try
         run!()
       catch(e)
-        socket.emit("error:#(options.id)", e)
+        emitError(options, e)
         
-    emit result(options, result)=
+    emitResult(options, result)=
       socket.emit("ran:#(options.id)", result)
+
+    emitError(options, error)=
+      socket.emit("error:#(options.id)", { message = error.message })
  
-    run with promise(options)=
-      convert error to emit(options)
+    runWithPromise(options)=
+      convert error to emit!(options)
         func    = options.func
         context = options.context
 
@@ -111,17 +114,23 @@ module.exports(port)=
 
       runFunc(context, callback)
         
-    run with callback(options)=
+    runWithCallback(options)=
       callback(error, result)=
-        emit result(options, result)
+        if (error)
+          emitError(options, e)
+        else
+          emitResult(options, result)
 
       convert error to emit(options)
         exec(options.context, options.func, callback)
         
     run(options)=
       convert error to emit(options)
-        result = exec(options.context, options.func)
-        emit result(options, result)
+        try
+          result = exec(options.context, options.func)
+          emitResult(options, result)
+        catch(e)
+          emitError(options, e)
 
     socket.on('runTask') @(options)
       context = options.context 
@@ -149,14 +158,14 @@ module.exports(port)=
         })
         socket.emit("running:#(options.id)", result)
       catch(e)
-        socket.emit("error:#(options.id)", e.message)
+        emitError(options, e)
 
     socket.on('run') @(options)
       if(options.promise)
-        run with promise(options)
+        runWithPromise(options)
       else
         if (options.callback)
-          run with callback(options)
+          runWithCallback(options)
         else
           run(options)
           

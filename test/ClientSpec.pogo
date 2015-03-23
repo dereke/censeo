@@ -10,9 +10,9 @@ describe 'client'
 
     it 'throws an error when one occurs on the server'
       try
-        client.run! @{ throw 'SERVER ERROR'}
+        client.run! @{ @throw @new Error 'SERVER ERROR' }
       catch(e)
-        expect(e).to.equal('SERVER ERROR')
+        expect(e.message).to.equal('SERVER ERROR')
    
   describe 'marshall data from client to server'
     it'passes variables to the server'
@@ -31,9 +31,9 @@ describe 'client'
       
     it 'throws an error when one occurs on the server'
       try
-        client.run! @{ throw 'SERVER ERROR'}
+        client.run! @{ @throw @new Error 'SERVER ERROR' }
       catch(e)
-        expect(e).to.equal('SERVER ERROR')
+        expect(e.message).to.equal('SERVER ERROR')
     
   describe 'asynchronise PogoScript'
     it 'runs on the server'
@@ -59,9 +59,9 @@ describe 'client'
 
     it 'throws an error when one occurs on the server'
       try
-        client.run!(promises: true) @{ throw 'SERVER ERROR'}
+        client.run!(promises: true) @{ @throw @new Error 'SERVER ERROR'}
       catch(e)
-        expect(e).to.equal('SERVER ERROR')
+        expect(e.message).to.equal('SERVER ERROR')
 
   describe 'require a file on the server'
     it'requires the correct file'
@@ -76,7 +76,7 @@ describe 'client'
         client.run!
           serverRequire './test/doesNotExist' 
 
-        @throw @new 'Should Not Reach This Code'
+        @throw @new Error 'Should Not Reach This Code'
       catch(e)
         expect(e.message).to.contain("Censeo could not find the file")
         expect(e.message).to.contain("./test/doesNotExist")
@@ -150,6 +150,6 @@ describe 'client'
       client.runTask!()
         null.invalidMethodCall()
     catch(e)
-      expect(e).to.contain("Cannot call method 'invalidMethodCall' of null")
+      expect(e.message).to.contain("'invalidMethodCall' of null")
       done()
 

@@ -26,9 +26,9 @@ module.exports(port)=
       socket = self.get socket!()
       promise @(success, error)      
         options.id = ++self.count
-        socket.emit("run", options)
         socket.on("ran:#(options.id)", success)
         socket.on("error:#(options.id)", error)
+        socket.emit("run", options)
 
     runTask(context = {}, func)=
       options = {
