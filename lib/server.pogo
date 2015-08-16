@@ -1,3 +1,5 @@
+log = (require 'debug')('censeo:server')
+
 serverRequire(path)=
   tryPath = path 
   if (path.0 == '.')
@@ -7,6 +9,7 @@ serverRequire(path)=
     require(tryPath)
   catch(e)
     if (e.code == 'MODULE_NOT_FOUND')
+      log('censeo paths', module.paths)
       @throw {
         message = "Censeo could not find the file '#(tryPath)'"
         code = e.code
@@ -61,7 +64,13 @@ pogoWrappers()=
         "
         
 module.exports(port)=
-  io = (require('socket.io'))()
+  app = require('http').createServer()
+  module.exports.listen(app)
+  app.listen(port)
+
+module.exports.listen(app)=
+  log 'Starting censeo'
+  io = (require('socket.io'))(app)
   tasks = []
   io.on('connection') @(socket)
     convert error to emit(options, run)=
@@ -161,6 +170,7 @@ module.exports(port)=
         emitError(options, e)
 
     socket.on('run') @(options)
+      log 'Run received'
       if(options.promise)
         runWithPromise(options)
       else
@@ -177,4 +187,4 @@ module.exports(port)=
           tasks.splice(tasks.indexOf(runningTask), 1)
           socket.emit("stopped:#(options.id)", result)
 
-  io.listen(port)
+    log 'Censeo server ready'

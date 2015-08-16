@@ -1,4 +1,15 @@
+CenseoError(message, code)=
+  this.message = message
+  this.code = code
+
+CenseoError.prototype = new(Error())
+CenseoError.prototype.name = "CenseoError"
+CenseoError.prototype.consturctor = CenseoError
+
 module.exports(port)=
+  unWrapError(doThrow)=
+    receiveError(error)=
+      doThrow(new(CenseoError(error.message)))
 
   running(socket, options, success)=
     socket.on("running:#(options.id)")
@@ -27,7 +38,7 @@ module.exports(port)=
       promise @(success, error)      
         options.id = ++self.count
         socket.on("ran:#(options.id)", success)
-        socket.on("error:#(options.id)", error)
+        socket.on("error:#(options.id)", unWrapError(error))
         socket.emit("run", options)
 
     runTask(context = {}, func)=
@@ -40,7 +51,7 @@ module.exports(port)=
       promise @(success, error)      
         options.id = ++self.count
         socket.emit("runTask", options)
-        socket.on("error:#(options.id)", error)
+        socket.on("error:#(options.id)", unWrapError(error))
         running(socket, options, success)
 
     run(promises = false, context = {}, func)=

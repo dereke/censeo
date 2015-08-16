@@ -28,9 +28,10 @@
   ],
   "license": "ISC",
   "dependencies": {
+    "bluebird": "^2.2.2",
+    "debug": "^2.2.0",
     "socket.io": "^1.0.6",
-    "socket.io-client": "^1.0.6",
-    "bluebird": "^2.2.2"
+    "socket.io-client": "^1.0.6"
   },
   "devDependencies": {
     "browserify": "^4.2.0",
