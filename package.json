@@ -1,6 +1,6 @@
 {
   "name": "censeo",
-  "version": "0.4.9",
+  "version": "0.5.0",
   "description": "Run arbitrary JavaScript or PogoScript on a server",
   "author": "Derek Ekins <derek@spathi.com>",
   "repository": {
