@@ -1,5 +1,5 @@
 (function() {
     var self = this;
-    module.exports.server = require("./lib/server");
-    module.exports.client = require("./lib/client");
+    module.exports.server = require("./server");
+    module.exports.client = require("./client");
 }).call(this);
