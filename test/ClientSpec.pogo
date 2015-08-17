@@ -21,30 +21,16 @@ describe 'client'
 
       expect(result).to.equal(2015)
 
-  describe 'asynchronise JavaScript'
-    it 'runs on the server'
-      result = client.run! @(callback)
-        fs =  require 'fs'
-        fs.readdir(process.cwd(), callback)
-
-      expect(result).to.include('node_modules')
-      
-    it 'throws an error when one occurs on the server'
-      try
-        client.run! @{ @throw @new Error 'SERVER ERROR' }
-      catch(e)
-        expect(e.message).to.equal('SERVER ERROR')
-    
   describe 'asynchronise PogoScript'
     it 'runs on the server'
-      result = client.run!(promises: true)
+      result = client.run!()
         fs = require 'fs'
         fs.readdir!(process.cwd(), ^)
 
       expect(result).to.include('node_modules')
 
     it 'runs a foreach on the server'
-      result = client.run!(promises: true)
+      result = client.run!()
         double(value)=
           promise @(success)
             success(value*2)
@@ -59,7 +45,7 @@ describe 'client'
 
     it 'throws an error when one occurs on the server'
       try
-        client.run!(promises: true) @{ @throw @new Error 'SERVER ERROR'}
+        client.run!() @{ @throw @new Error 'SERVER ERROR'}
       catch(e)
         expect(e.message).to.equal('SERVER ERROR')
 
@@ -126,9 +112,10 @@ describe 'client'
 
     it'runs a task containing promises' @(done)
       task = client.runTask!()
+        fs = require 'fs'
+        fs.readdir!(process.cwd(), ^)
         asyncTaskRan = false
         intervalId = setInterval
-          fs = require 'fs'
           fs.readdir!(process.cwd(), ^)
           asyncTaskRan := true
         200

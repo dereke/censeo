@@ -1,3 +1,6 @@
+botname = (require 'botname')()
+console.log('Client name', botname)
+
 CenseoError(message, code)=
   this.message = message
   this.code = code
@@ -7,6 +10,11 @@ CenseoError.prototype.name = "CenseoError"
 CenseoError.prototype.consturctor = CenseoError
 
 module.exports(port)=
+  requestId = 0
+  newRequestId()=
+    ++requestId
+    "#(botname):#(requestId)"
+
   unWrapError(doThrow)=
     receiveError(error)=
       doThrow(new(CenseoError(error.message)))
@@ -27,16 +35,14 @@ module.exports(port)=
           success(self.socket)
         else
           io = require 'socket.io-client'
-          self.socket = io("http://localhost:#(port)")    
+          self.socket = io("http://localhost:#(port)")
           self.socket.on 'connect'
             success(self.socket)        
 
-    count = 0
-    
     exec(options)=
       socket = self.get socket!()
       promise @(success, error)      
-        options.id = ++self.count
+        options.id = newRequestId()
         socket.on("ran:#(options.id)", success)
         socket.on("error:#(options.id)", unWrapError(error))
         socket.emit("run", options)
@@ -49,7 +55,7 @@ module.exports(port)=
 
       socket = self.get socket!()
       promise @(success, error)      
-        options.id = ++self.count
+        options.id = newRequestId()
         socket.emit("runTask", options)
         socket.on("error:#(options.id)", unWrapError(error))
         running(socket, options, success)
