@@ -1,4 +1,6 @@
-log = (require 'debug')('censeo:server')
+http     = require 'http'
+socketIO = require 'socket.io'
+log      = (require 'debug')('censeo:server')
 
 serverRequire(path)=
   tryPath = path
@@ -63,14 +65,9 @@ pogoWrappers()=
         }
         "
 
-module.exports(port)=
-  app = require('http').createServer()
-  module.exports.listen(app)
-  app.listen(port)
-
-module.exports.listen(app)=
+module.exports(app)=
   log 'Starting censeo'
-  server = (require('socket.io'))(app)
+  server = socketIO(app)
   tasks = []
 
   server.on('connection') @(socket)
@@ -131,3 +128,8 @@ module.exports.listen(app)=
           socket.emit("stopped:#(options.id)", result)
 
     log 'Censeo server ready'
+
+module.exports.listen(port)=
+  app = http.createServer()
+  module.exports(app)
+  app.listen(port)

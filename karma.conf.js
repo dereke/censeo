@@ -1,4 +1,4 @@
-require('./lib/server.js')(3001)
+require('./lib/server.js').listen(3001);
 
 module.exports = function(config) {
   config.set({
