@@ -12,15 +12,22 @@ First of all you need to start up the server specifying a port number to use.
 If you are using karma you may want to put this in your `karma.conf.js` file.
 
 ```
-require('censeo').server(3001)
+require('censeo').server.listen(3001)
 ```
 
+or if you already have an http server
+
+```
+require('censeo').server(http)
+```
 
 Next you want to create a client:
 
 ```
 client  = require('censeo').client(3001)
 ```
+
+where 3001 is the port censeo is running on
 
 Then in your test (you should only use this for tests!).
 
@@ -33,23 +40,26 @@ client
   })
 ```
 
-You can also run async code on the server
+or
 
 ```
 client
-  .run(function(callback) {
+  .run(function() {
       var fs = require("fs");
-      fs.readdir(process.cwd(), callback);
+      return new Promise(function(success){
+        fs.readdir(process.cwd(), success);
+      });
   }).then(function(result) {
       expect(result).to.include("node_modules");
   });
 ```
 
-Where censeo can come in really handy is if you need to spool up a webserver to test against:
+Where censeo can come in really handy is if you need to spool up a webserver to test against.
+To do this we use `runTask` which lets you start a task and stop it at a later point:
 
 ```
 client
-  .run(function() {
+  .runTask(function() {
     var http, app, server;
     http = require("http");
     app = http.createServer(function(req, res) {
@@ -77,8 +87,6 @@ client
             return server.close(done);
         }
     };
-}, {
-    task: true
 }).then(function(task){
   // make some http requests to the server
   // then stop the server
@@ -99,7 +107,7 @@ expect(result).to.equal(2)
 
 or to run a web server
 ```
-task = client.run!(task: true)
+task = client.runTask!()
   http    = require 'http'
   app = http.createServer @(req, res)
     headers = {
