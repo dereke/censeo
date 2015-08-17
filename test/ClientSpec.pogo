@@ -1,4 +1,4 @@
-client  = (require('../lib/client'))(3001)
+client  = (require('../client'))(3001)
 request = require 'reqwest'
 
 describe 'client'

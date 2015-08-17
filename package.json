@@ -8,7 +8,9 @@
     "url": "https://github.com/dereke/censeo.git"
   },
   "scripts": {
-    "test": "node_modules/karma/bin/karma start"
+    "test": "DEBUG=censeo* karma start",
+    "build": "pogo -cw ./*.pogo",
+    "prepublish": "pogo -c ./*.pogo"
   },
   "bugs": {
     "url": "https://github.com/dereke/censeo/issues"
@@ -23,8 +25,8 @@
   "main": "index.js",
   "files": [
     "index.js",
-    "lib/server.js",
-    "lib/client.js"
+    "server.js",
+    "client.js"
   ],
   "license": "ISC",
   "dependencies": {

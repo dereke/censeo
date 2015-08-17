@@ -1,2 +1,4 @@
 node_modules
 *.swp
+server.js
+client.js
