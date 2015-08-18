@@ -65,9 +65,8 @@ pogoWrappers()=
         }
         "
 
-module.exports(app)=
+module.exports(server)=
   log 'Starting censeo'
-  server = socketIO(app)
   tasks = []
 
   server.on('connection') @(socket)
@@ -131,5 +130,6 @@ module.exports(app)=
 
 module.exports.listen(port)=
   app = http.createServer()
-  module.exports(app)
+  server = socketIO(app)
+  module.exports(server)
   app.listen(port)
