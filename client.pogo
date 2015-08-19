@@ -20,12 +20,14 @@ module.exports(port)=
       doThrow(new(CenseoError(error.message)))
 
   running(socket, options, success)=
-    socket.on("running:#(options.id)")
+    socket.on("running:#(options.id)") @(result)
       success({
-        stop()=          
+        stop()=
           promise @(success)
             socket.on("stopped:#(options.id)", success)
             socket.emit("stop", options)
+
+        data = result.data
       })
 
   {
@@ -37,11 +39,11 @@ module.exports(port)=
           io = require 'socket.io-client'
           self.socket = io("http://localhost:#(port)")
           self.socket.on 'connect'
-            success(self.socket)        
+            success(self.socket)
 
     exec(options)=
       socket = self.get socket!()
-      promise @(success, error)      
+      promise @(success, error)
         options.id = newRequestId()
         socket.on("ran:#(options.id)", success)
         socket.on("error:#(options.id)", unWrapError(error))
@@ -54,22 +56,17 @@ module.exports(port)=
       }
 
       socket = self.get socket!()
-      promise @(success, error)      
+      promise @(success, error)
         options.id = newRequestId()
         socket.emit("runTask", options)
         socket.on("error:#(options.id)", unWrapError(error))
         running(socket, options, success)
 
-    run(promises = false, context = {}, func)=
+    run(context = {}, func)=
       options = {
         func    = func.toString()
         context = context
       }
-      if (promises)
-        options.promise = true
-      else      
-        if (func.length == 1)
-          options.callback = true
-        
+
       self.exec(options, func)
   }

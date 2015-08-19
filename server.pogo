@@ -109,6 +109,7 @@ module.exports(server)=
       tasks.push({
         id = options.id
         stop = result.stop
+        data = result.data
       })
       socket.emit("running:#(options.id)", result)
 

@@ -13,7 +13,7 @@ describe 'client'
         client.run! @{ @throw @new Error 'SERVER ERROR' }
       catch(e)
         expect(e.message).to.equal('SERVER ERROR')
-   
+
   describe 'marshall data from client to server'
     it'passes variables to the server'
       result = client.run!(context: {year = 2014})
@@ -60,14 +60,14 @@ describe 'client'
     it 'requires a file that does not exist'
       try
         client.run!
-          serverRequire './test/doesNotExist' 
+          serverRequire './test/doesNotExist'
 
         @throw @new Error 'Should Not Reach This Code'
       catch(e)
         expect(e.message).to.contain("Censeo could not find the file")
         expect(e.message).to.contain("./test/doesNotExist")
 
-      
+
   describe 'long running task'
     it 'runs on the server and can be stopped later' @(done) =>
       self.timeout(5000)
@@ -94,7 +94,7 @@ describe 'client'
           stop(done)=
             server.close(done)
         }
-        
+
       server url = 'http://localhost:8555'
 
       response = request!({url = server url})
@@ -121,7 +121,7 @@ describe 'client'
         200
 
         {
-          stop(done)= 
+          stop(done)=
             clearInterval(intervalId)
             done(asyncTaskRan)
         }
@@ -129,6 +129,28 @@ describe 'client'
       setTimeout
         result = task.stop!()
         expect(result).to.be.true
+        done()
+      500
+
+    it 'returns arbitrary data from the task' @(done)
+      task = client.runTask!()
+        {
+          stop(done)=
+            done()
+
+          data = {
+            a = 'b'
+            c = [1,2]
+          }
+        }
+
+      expect(task.data).to.eql {
+        a = 'b'
+        c = [1,2]
+      }
+
+      setTimeout
+        task.stop!()
         done()
       500
 
