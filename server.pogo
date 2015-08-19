@@ -123,9 +123,9 @@ module.exports(server)=
       runningTask = [task <- tasks, task.id == options.id, task].0
 
       if (runningTask)
-        runningTask.stop() @(result)
-          tasks.splice(tasks.indexOf(runningTask), 1)
-          socket.emit("stopped:#(options.id)", result)
+        result = runningTask.stop!()
+        tasks.splice(tasks.indexOf(runningTask), 1)
+        socket.emit("stopped:#(options.id)", result)
 
     log 'Censeo server ready'
 

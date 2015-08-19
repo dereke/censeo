@@ -91,8 +91,9 @@ describe 'client'
         server  = app.listen(8555)
         console.log "listening on 8555"
         {
-          stop(done)=
-            server.close(done)
+          stop()=
+            promise @(done)
+              server.close(done)
         }
 
       server url = 'http://localhost:8555'
@@ -121,9 +122,10 @@ describe 'client'
         200
 
         {
-          stop(done)=
-            clearInterval(intervalId)
-            done(asyncTaskRan)
+          stop()=
+            promise @(done)
+              clearInterval(intervalId)
+              done(asyncTaskRan)
         }
 
       setTimeout
@@ -135,8 +137,9 @@ describe 'client'
     it 'returns arbitrary data from the task' @(done)
       task = client.runTask!()
         {
-          stop(done)=
-            done()
+          stop()=
+            promise @(done)
+              done()
 
           data = {
             a = 'b'
@@ -151,6 +154,19 @@ describe 'client'
 
       setTimeout
         task.stop!()
+        done()
+      500
+
+    it 'waits for a stop that includes a promise' @(done)
+      task = client.runTask!()
+        {
+          stop()=
+            promise @(success)
+              success('complete')
+        }
+
+      setTimeout
+        expect(task.stop!()).to.equal('complete')
         done()
       500
 
