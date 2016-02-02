@@ -1,4 +1,4 @@
-botname = (require 'botname')()
+botname = (require 'node-random-name')
 console.log('Client name', botname)
 
 CenseoError(message, code)=
